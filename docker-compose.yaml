@@ -1,0 +1,78 @@
+version: '3.8'
+
+networks:
+  mongoCluster:
+    driver: bridge
+
+services:
+  mongo1:
+    image: mongodb/mongodb-community-server:latest
+    container_name: mongo1
+    command: ["--replSet", "rs0", "--bind_ip", "localhost,mongo1"]
+    ports:
+      - "27011:27017"
+    networks:
+      - mongoCluster
+
+  mongo2:
+    image: mongodb/mongodb-community-server:latest
+    container_name: mongo2
+    command: ["--replSet", "rs0", "--bind_ip", "localhost,mongo2"]
+    ports:
+      - "27012:27017"
+    networks:
+      - mongoCluster
+
+  mongo3:
+    image: mongodb/mongodb-community-server:latest
+    container_name: mongo3
+    command: ["--replSet", "rs0", "--bind_ip", "localhost,mongo3"]
+    ports:
+      - "27013:27017"
+    networks:
+      - mongoCluster
+
+  mongo4:
+    image: mongodb/mongodb-community-server:latest
+    container_name: mongo4
+    command: ["--replSet", "rs0", "--bind_ip", "localhost,mongo4"]
+    ports:
+      - "27014:27017"
+    networks:
+      - mongoCluster
+
+  mongo5:
+    image: mongodb/mongodb-community-server:latest
+    container_name: mongo5
+    command: ["--replSet", "rs0", "--bind_ip", "localhost,mongo5"]
+    ports:
+      - "27015:27017"
+    networks:
+      - mongoCluster
+
+  mongo6:
+    image: mongodb/mongodb-community-server:latest
+    container_name: mongo6
+    command: ["--replSet", "rs0", "--bind_ip", "localhost,mongo6"]
+    ports:
+      - "27016:27017"
+    networks:
+      - mongoCluster
+
+  mongo7:
+    image: mongodb/mongodb-community-server:latest
+    container_name: mongo7
+    command: ["--replSet", "rs0", "--bind_ip", "localhost,mongo7"]
+    ports:
+      - "27017:27017"
+    networks:
+      - mongoCluster
+
+  mongo8:
+    image: mongodb/mongodb-community-server:latest
+    container_name: mongo8
+    command: ["--replSet", "rs0", "--bind_ip", "localhost,mongo8"]
+    ports:
+      - "27018:27017"
+    networks:
+    - mongoCluster

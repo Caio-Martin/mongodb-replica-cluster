@@ -1,0 +1,180 @@
+# 🐳 Replica Set MongoDB com Docker Compose
+
+Este projeto demonstra a configuração de um Replica Set do MongoDB com 8 nós usando Docker Compose, incluindo testes de tolerância a falhas e alta disponibilidade.
+
+---
+
+## 📦 Estrutura do Projeto
+
+- **8 containers MongoDB**
+- **Replica Set configurado como `rs0`**
+- Cada container mapeado com uma porta distinta no host
+- Um dos membros configurado como **`voto desabilitado`** (sem direito a votar ou virar primário)
+
+---
+
+## 🚀 Como subir o ambiente
+
+### Pré-requisitos
+
+- Docker
+- Docker Compose
+- MongoDB Compass (opcional)
+
+### Subir os containers
+
+```bash
+docker-compose up -d
+```
+
+> Isso criará os 8 containers com rede compartilhada `mongoCluster`.
+
+---
+
+## 🔁 Inicializando o Replica Set
+
+1. Acesse o container `mongo1`:
+```bash
+docker exec -it mongo1 mongosh
+```
+
+2. Execute o seguinte comando para iniciar o Replica Set:
+
+```js
+rs.initiate({
+  _id: "rs0",
+  members: [
+    { _id: 0, host: "mongo1:27017" },
+    { _id: 1, host: "mongo2:27017" },
+    { _id: 2, host: "mongo3:27017" },
+    { _id: 3, host: "mongo4:27017" },
+    { _id: 4, host: "mongo5:27017" },
+    { _id: 5, host: "mongo6:27017" },
+    { _id: 6, host: "mongo7:27017" },
+    { _id: 7, host: "mongo8:27017", votes: 0, priority: 0 }
+  ]
+})
+```
+
+3. Verifique o status do cluster:
+
+```js
+rs.status()
+```
+
+4. Verifique quem é o nó primário atual:
+
+```js
+rs.isMaster()
+```
+
+---
+
+## 🧲 Testes realizados
+
+### ✅ Teste 06 — Queda de 1 ou 2 nós secundários
+
+- Paramos 2 nós com:
+```bash
+docker stop mongo3 mongo4
+```
+
+- Verificamos que o cluster continuou funcional com:
+
+```js
+rs.status()
+```
+
+- Inserimos dados normalmente no primário:
+```js
+use testdb
+db.teste.insert({ nome: "Teste com secundários fora" })
+db.teste.find()
+```
+
+- Reiniciamos os nós:
+```bash
+docker start mongo3 mongo4
+```
+
+- Verificamos novamente a reintegração com:
+
+```js
+rs.status()
+```
+
+---
+
+### ✅ Teste 07 — Queda do nó primário
+
+- Identificamos o primário com:
+```js
+rs.isMaster()
+```
+
+- Paramos o container correspondente, por exemplo:
+```bash
+docker stop mongo1
+```
+
+- Aguardamos alguns segundos e conectamos a outro nó, como `mongo2`:
+
+```bash
+docker exec -it mongo2 mongosh
+```
+
+- Verificamos o novo primário:
+```js
+rs.status()
+```
+
+- Realizamos nova inserção:
+```js
+use testdb
+db.teste.insert({ nome: "Teste após queda do primário" })
+db.teste.find()
+```
+
+- Reiniciamos o primário antigo:
+```bash
+docker start mongo1
+```
+
+---
+
+## 🌐 Acesso via MongoDB Compass
+
+Você pode acessar qualquer nó individualmente usando:
+
+```
+mongodb://localhost:27011
+```
+
+Ou conectar ao Replica Set completo com:
+
+```
+mongodb://localhost:27011,localhost:27012,localhost:27013/?replicaSet=rs0
+```
+## 🚰 Comandos úteis
+
+| Descrição                         | Comando                              |
+|----------------------------------|--------------------------------------|
+| Subir containers                 | `docker-compose up -d`              |
+| Parar container específico       | `docker stop mongoX`                |
+| Iniciar container específico     | `docker start mongoX`               |
+| Acessar o Mongo via terminal     | `docker exec -it mongoX mongosh`    |
+| Ver status do Replica Set        | `rs.status()`                       |
+| Ver primário atual               | `rs.isMaster()`                     |
+| Inserir dados                    | `db.teste.insert({ nome: "..." })`  |
+| Consultar dados                  | `db.teste.find()`                   |
+
+---
+
+## 📁 Arquivo docker-compose.yaml (resumo)
+
+- Cada container usa a imagem `mongodb/mongodb-community-server:latest`
+- Replica Set nomeado como `rs0`
+- Porta local diferente para cada container (`27011` a `27018`)
+- Container `mongo8` com `votes: 0` e `priority: 0`
+
+
