@@ -72,7 +72,7 @@ rs.isMaster()
 
 ## 🧲 Testes realizados
 
-### ✅ Teste 06 — Queda de 1 ou 2 nós secundários
+### ✅ Queda de 1 ou 2 nós secundários
 
 - Paramos 2 nós com:
 ```bash
@@ -105,7 +105,7 @@ rs.status()
 
 ---
 
-### ✅ Teste 07 — Queda do nó primário
+### ✅ Queda do nó primário
 
 - Identificamos o primário com:
 ```js
